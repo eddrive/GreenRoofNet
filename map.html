@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Maps con GeoJSON</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOURAPI"></script>
+    <style>
+        #map {
+            height: 500px;
+            width: 500px; /* Imposta la mappa come quadrata */
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        let map;
+
+        function initMap() {
+            // Inizializza la mappa
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 45.4642, lng: 9.19 }, // Milano
+                zoom: 20,
+                mapTypeId: "satellite",
+                tilt: 0, // Inizialmente senza tilt
+                disableDefaultUI: true // Disabilita tutti i controlli di default
+            });
+
+            // Carica il GeoJSON
+            map.data.loadGeoJson('./cleaned_potentialGR.geojson', {}, () => {
+                // Imposta uno stile predefinito
+                map.data.setStyle({
+                    fillColor: "green", // Predefinito verde
+                    strokeColor: "green",
+                    strokeWeight: 2,
+                    fillOpacity: 0.5
+                });
+            });
+        }
+
+        // Funzione per aggiornare lo stile del GeoJSON
+        function updateGeoJsonStyle(fillColor, strokeColor, visible) {
+            map.data.setStyle({
+                fillColor: fillColor,
+                strokeColor: strokeColor,
+                strokeWeight: visible ? 2 : 0,
+                fillOpacity: visible ? 0.5 : 0,
+                visible: visible
+            });
+        }
+
+        // Inizializza la mappa al caricamento
+        window.onload = initMap;
+    </script>
+
+    <!-- Aggiungi html2canvas per catturare l'immagine -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</body>
+</html>
