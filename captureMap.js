@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer');
+const { chromium, webkit, firefox } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 
@@ -29,97 +29,121 @@ if (!fs.existsSync(outputDirMasks)) {
     fs.mkdirSync(outputDirMasks, { recursive: true });
 }
 
-// Funzione per generare un punto casuale all'interno del quadrato
 function generateRandomCoordinate() {
     const lat = Math.random() * (latMax - latMin) + latMin;
     const lng = Math.random() * (lngMax - lngMin) + lngMin;
     return { lat, lng };
 }
 
-async function captureMap(page,includeGeoJson, coordinates) {
-    console.log(`Inizio cattura immagine. GeoJSON incluso: ${includeGeoJson}, Coordinate: ${JSON.stringify(coordinates)}`);
+async function captureMap(page, includeGeoJson, coordinates) {
+    try {
+        console.log(`[${includeGeoJson ? 'MASK' : 'BASE'}] Starting capture for coordinates: ${JSON.stringify(coordinates)}`);
 
-    // TODO: add await map instead of setTimeout
-    console.log('pre center');
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-   
+        // Wait for map to be ready
+        console.log('[STATUS] Waiting for map object...');
+        await page.waitForFunction(() => window.map && typeof map.setCenter === 'function');
 
-    // Sposta il centro della mappa sulla coordinata specificata
-    await page.evaluate((coords) => {
-        map.setCenter(coords);
-    }, coordinates);
-
-
-
-    // Configura la visibilità e il colore del GeoJSON
-    if (includeGeoJson) {
-        console.log('Abilitando maschera GeoJSON verde');
-        await page.evaluate(() => {
-           setMask(true); // Abilita la maschera
+        // Set center coordinates
+        console.log('[STATUS] Setting map center...');
+        await page.evaluate(coords => map.setCenter(coords), coordinates);
+        
+        // Wait for map to stabilize after movement
+        console.log('[STATUS] Waiting for map to stabilize...');
+        await page.evaluate(async () => {
+            await new Promise(resolve => {
+                google.maps.event.addListenerOnce(map, 'idle', resolve);
+            });
         });
-    } else {
-        console.log('Disabilitando maschera GeoJSON');
-        await page.evaluate(() => {
-            setMask(false); // Disabilita la maschera
+
+        // Toggle GeoJSON visibility
+        console.log(`[STATUS] ${includeGeoJson ? 'Enabling' : 'Disabling'} mask...`);
+        await page.evaluate((shouldShow) => {
+            setMask(shouldShow);
+        }, includeGeoJson);
+
+        // Wait for GeoJSON visibility update
+        console.log('[STATUS] Waiting for mask visibility update...');
+        await page.waitForFunction((expectedVisibility) => {
+            const style = map.data.getStyle();
+            return style.visible === expectedVisibility;
+        }, includeGeoJson, { timeout: 10000 });
+
+        // Extra safety delay
+        await page.waitForTimeout(500);
+
+        // Capture screenshot
+        console.log('[STATUS] Capturing screenshot...');
+        const mapElement = await page.locator('#map');
+        const fileName = `${coordinates.lat.toFixed(5)}_${coordinates.lng.toFixed(5)}.png`;
+        const outputPath = includeGeoJson 
+            ? path.join(outputDirMasks, fileName)
+            : path.join(outputDirImages, fileName);
+
+        await mapElement.screenshot({ 
+            path: outputPath, 
+            captureBeyondViewport: false,
+            animations: 'disabled'  // Disable CSS animations
         });
+        console.log(`[SUCCESS] Image saved to: ${outputPath}`);
+
+    } catch (error) {
+        console.error(`[ERROR] Capture failed: ${error.message}`);
+        throw error; // Rethrow to bubble up the error
     }
-
-    console.log('post mask');
-    // TODO: add await mask instead of setTimeout, maybe load 2 different pages?
-    // Attendi il rendering completo della mappa
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-
-    // Cattura l'elemento della mappa
-    const mapElement = await page.$('#map');
-    if (!mapElement) {
-        throw new Error('Elemento mappa non trovato');
-    }
-
-    // Genera il nome del file in base alle coordinate
-    const fileName = `${coordinates.lat.toFixed(5)}_${coordinates.lng.toFixed(5)}.png`;
-    const outputPath = includeGeoJson
-        ? path.join(outputDirMasks, fileName)
-        : path.join(outputDirImages, fileName);
-
-    
-
-
-    // Salva lo screenshot
-    await mapElement.screenshot({ path: outputPath});
-    console.log(`Immagine salvata in: ${outputPath}`);
-
-    // await browser.close();
 }
 
-// Esegui screenshot con le coordinate fisse e casuali
 (async () => {
-
-    const browser = await puppeteer.launch({ headless: false });
-    const page = await browser.newPage();
-
-    // Carica la pagina HTML locale
-    await page.goto('http://localhost:5500/map.html');
-    await page.setViewport({ width: 600, height: 600 });
-
-    // Nascondi tutti i bottoni e controlli
-    await page.evaluate(() => {
-        document.querySelectorAll('button').forEach((button) => {
-            button.style.display = 'none';
+    let browser;
+    try {
+        console.log('[INIT] Launching browser...');
+        
+        //INFO:  set headless to false to see the browser in action
+        browser = await chromium.launch({ headless: false });
+        const page = await browser.newPage();
+        
+        console.log('[NAVIGATION] Loading page...');
+        await page.goto('http://localhost:3000/map.html', { 
+            waitUntil: 'networkidle',
+            timeout: 60000
         });
-    });
 
-    // Prima cattura le immagini per le coordinate fisse
-    for (const coords of fixedCoordinates) {
-        await captureMap(page, false, coords); // Immagine normale
-        await captureMap(page, true, coords);  // Maschera GeoJSON
-    }
+        console.log('[SETUP] Configuring viewport...');
+        await page.setViewportSize({ width: 600, height: 600 });
 
-    // Poi cattura le immagini per due coordinate casuali
-    const randomPoints = 2;
-    for (let i = 0; i < randomPoints; i++) {
-        const coords = generateRandomCoordinate();
-        await captureMap(page,false, coords); // Immagine normale
-        await captureMap(page, true, coords);  // Maschera GeoJSON
+        console.log('[SETUP] Hiding buttons...');
+        await page.evaluate(() => {
+            document.querySelectorAll('button').forEach(button => {
+                button.style.display = 'none';
+            });
+        });
+
+        console.log('[SETUP] Waiting for map container...');
+        await page.waitForSelector('#map', { state: 'visible', timeout: 15000 });
+
+        // Process fixed coordinates
+        console.log('[PROCESSING] Starting fixed coordinates...');
+        for (const coords of fixedCoordinates) {
+            console.log(`[PROCESSING] Fixed coordinate: ${JSON.stringify(coords)}`);
+            await captureMap(page, false, coords);
+            await captureMap(page, true, coords);
+        }
+
+        // Process random coordinates
+        console.log('[PROCESSING] Starting random coordinates...');
+        for (let i = 0; i < 2; i++) {
+            const coords = generateRandomCoordinate();
+            console.log(`[PROCESSING] Random coordinate ${i+1}: ${JSON.stringify(coords)}`);
+            await captureMap(page, false, coords);
+            await captureMap(page, true, coords);
+        }
+
+        console.log('[SUCCESS] All captures completed!');
+    } catch (error) {
+        console.error(`[FATAL ERROR] Main execution failed: ${error.message}`);
+    } finally {
+        if (browser) {
+            console.log('[CLEANUP] Closing browser...');
+            await browser.close();
+        }
     }
 })();

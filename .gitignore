@@ -1,2 +1,4 @@
 cleaned_potentialGR.geojson
 /dataset
+package-lock.json
+node_modules

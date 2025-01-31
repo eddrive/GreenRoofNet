@@ -19,11 +19,13 @@
     <button id="maskButton">Mask</button>
 
     <script>
-        let map;
+       
+      window.map = null;
 
       function initMap() {
+        console.log("initMap");
         // Inizializza la mappa
-        map = new google.maps.Map(document.getElementById("map"), {
+        window.map = new google.maps.Map(document.getElementById("map"), {
           center: { lat: 45.4642, lng: 9.19 }, // Milano
           zoom: 20,
           mapTypeId: "satellite",
@@ -32,9 +34,9 @@
         });
 
         // Carica il GeoJSON
-        map.data.loadGeoJson("./cleaned_potentialGR.geojson", {}, () => {
+        window.map.data.loadGeoJson("./cleaned_potentialGR.geojson", {}, () => {
           // Imposta uno stile predefinito
-          map.data.setStyle({
+          window.map.data.setStyle({
             fillColor: "green", // Predefinito verde
             strokeColor: "green",
             strokeWeight: 2,
@@ -46,7 +48,7 @@
 
       function setMask(vis) {
 
-        map.data.setStyle({
+        window.map.data.setStyle({
           fillColor: "green",
           strokeColor: "green",
           strokeWeight: vis ? 2 : 0,
@@ -58,7 +60,7 @@
        // Add event listener to the button
        document
         .getElementById("maskButton")
-        .addEventListener("click", () => setMask(!map.data.getStyle().visible));
+        .addEventListener("click", () => setMask(!window.map.data.getStyle().visible));
 
 
       // Inizializza la mappa al caricamento
