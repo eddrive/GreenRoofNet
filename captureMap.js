@@ -9,10 +9,10 @@ const VERBOSITY = {
   DETAILED: 2,
 };
 const verbosityLevel = VERBOSITY.BASIC; // Set desired verbosity level
-const randomCoordinatesCount = 100; // Numero di coordinate casuali da generare
-const headless = true; // Impostare su true per eseguire in modalità headless
+const randomCoordinatesCount = 100; // Number of random coordinates to generate
+const headless = true; // Set to true for headless execution
 
-// Coordinate specifiche fornite dall'utente
+// Fixed coordinates
 const fixedCoordinates = [
   { lat: 45.496398017034764, lng: 9.224118614878336 },
   { lat: 45.506786509037966, lng: 9.229450783645406 },
@@ -21,17 +21,17 @@ const fixedCoordinates = [
   { lat: 45.49344335822781, lng: 9.228427352122873 },
 ];
 
-// Limiti del quadrato a Milano per generare punti casuali
+// Bounding box for random coordinates
 const latMin = 45.46;
 const latMax = 45.48;
 const lngMin = 9.18;
 const lngMax = 9.22;
 
-// Percorsi delle directory di output
+// Output directories
 const outputDirImages = path.join(__dirname, "dataset/images");
 const outputDirMasks = path.join(__dirname, "dataset/masks");
 
-// Crea le directory di output se non esistono
+// Ensure output directories exist
 if (!fs.existsSync(outputDirImages)) {
   fs.mkdirSync(outputDirImages, { recursive: true });
 }
@@ -53,81 +53,107 @@ function generateRandomCoordinate() {
   return { lat, lng };
 }
 
+// Wait for tiles to load reliably
+async function waitForTilesToLoad(page) {
+  await page.evaluate(() => {
+    return new Promise((resolve) => {
+      // We'll consider the tiles loaded once no render events have occurred for this many ms.
+      const idleThreshold = 100; 
+      let lastRenderTime = Date.now();
+
+      // Update the last render time on every render event.
+      const onRender = () => {
+        lastRenderTime = Date.now();
+      };
+
+      // Attach the render event listener.
+      window.map.events.add('render', onRender);
+
+      // Function to check if the map has been idle.
+      const checkIfIdle = () => {
+        // If no render event occurred for at least idleThreshold ms, assume loading is complete.
+        if (Date.now() - lastRenderTime > idleThreshold) {
+          window.map.events.remove('render', onRender);
+          resolve();
+        } else {
+          // Otherwise, check again on the next animation frame.
+          requestAnimationFrame(checkIfIdle);
+        }
+      };
+
+      // Start checking.
+      checkIfIdle();
+    });
+  });
+}
+
+
+
+// Wait for the mask visibility update
+async function waitForMaskVisibility(page, expectedVisibility) {
+  let attempts = 0;
+  const maxAttempts = 30; // Wait for up to 30 seconds
+
+  while (attempts < maxAttempts) {
+    const isVisible = await page.evaluate(() => window.maskVisible);
+    if (isVisible === expectedVisibility) return;
+
+    await page.waitForTimeout(1000); // Wait 1 second before checking again
+    attempts++;
+  }
+
+  throw new Error("Mask visibility update timeout");
+}
+
 // Capture map screenshots
 async function captureMap(page, includeGeoJson, coordinates) {
   try {
-    log(
-      `[${includeGeoJson ? "MASK" : "BASE"}] Starting capture for ${coordinates.length} coordinates...`,
-      VERBOSITY.BASIC
-    );
+    log(`[${includeGeoJson ? "MASK" : "BASE"}] Capturing ${coordinates.length} coordinates...`, VERBOSITY.BASIC);
 
-    // Wait for map to be ready
-    log("[STATUS] Waiting for map object...", VERBOSITY.DETAILED);
-    await page.waitForFunction(
-      () => window.map && typeof map.setCenter === "function"
-    );
+    // Wait for Azure Maps to be ready
+    log("[STATUS] Waiting for Azure Maps object...", VERBOSITY.DETAILED);
+    await page.waitForFunction(() => window.map && typeof window.map.setCamera === "function");
 
-    // Toggle GeoJSON visibility
-    log(
-      `[STATUS] ${includeGeoJson ? "Enabling" : "Disabling"} mask...`,
-      VERBOSITY.DETAILED
-    );
-    await page.evaluate((shouldShow) => setMask(shouldShow), includeGeoJson);
+    // Toggle mask visibility
+    log(`[STATUS] ${includeGeoJson ? "Enabling" : "Disabling"} mask...`, VERBOSITY.DETAILED);
+    await page.evaluate((shouldShow) => {
+      if (window.setMask) {
+        window.setMask(shouldShow);
+        window.maskVisible = shouldShow;
+      }
+    }, includeGeoJson);
 
-    // Wait for GeoJSON visibility update
+    // Ensure mask visibility is updated
     log("[STATUS] Waiting for mask visibility update...", VERBOSITY.DETAILED);
-    await page
-      .waitForFunction(
-        (expectedVisibility) => {
-          const style = map.data.getStyle();
-          return style.visible === expectedVisibility;
-        },
-        includeGeoJson,
-        { timeout: 10000 }
-      )
-      .catch((error) =>
-        log(`[WARNING] Mask visibility update timeout: ${error.message}`, VERBOSITY.BASIC)
-      );
+    await waitForMaskVisibility(page, includeGeoJson);
 
     for (const coords of coordinates) {
-      log(
-        `[STATUS] Setting map center to: ${JSON.stringify(coords)}...`,
-        VERBOSITY.DETAILED
-      );
-      await page.evaluate((c) => map.setCenter(c), coords);
+      log(`[STATUS] Moving to: ${JSON.stringify(coords)}...`, VERBOSITY.DETAILED);
+      await page.evaluate((c) => window.map.setCamera({ center: [c.lng, c.lat] }), coords);
+
 
       log("[STATUS] Waiting for tiles to load...", VERBOSITY.DETAILED);
-      await page.evaluate(async () => {
-        await new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            reject(new Error("Tiles failed to load within 10 seconds"));
-          }, 10000); // 10-second timeout
-
-          google.maps.event.addListenerOnce(map, "tilesloaded", () => {
-            clearTimeout(timeout);
-            resolve();
-          });
-        });
-      });
+      // harcode a 2 sec timer
+      // await page.waitForTimeout(1000);
+       await waitForTilesToLoad(page);
 
       // Capture screenshot
       log("[STATUS] Capturing screenshot...", VERBOSITY.DETAILED);
       const mapElement = await page.locator("#map");
       const fileName = `${coords.lat.toFixed(5)}_${coords.lng.toFixed(5)}.png`;
-      const outputPath = includeGeoJson
-        ? path.join(outputDirMasks, fileName)
-        : path.join(outputDirImages, fileName);
+      const outputPath = includeGeoJson ? path.join(outputDirMasks, fileName) : path.join(outputDirImages, fileName);
 
       await mapElement.screenshot({
         path: outputPath,
         captureBeyondViewport: false,
         animations: "disabled",
       });
+
       log(`[SUCCESS] Image saved to: ${outputPath}`, VERBOSITY.BASIC);
     }
   } catch (error) {
     log(`[ERROR] Capture failed: ${error.message}`, VERBOSITY.BASIC);
-    throw error; // Rethrow to bubble up the error
+    throw error;
   }
 }
 
@@ -140,13 +166,10 @@ async function captureMap(page, includeGeoJson, coordinates) {
     const page = await browser.newPage();
 
     log("[NAVIGATION] Loading page...", VERBOSITY.BASIC);
-    await page.goto("http://localhost:3000/map.html", {
-      waitUntil: "networkidle",
-      timeout: 60000,
-    });
+    await page.goto("http://localhost:3000/map.html", { waitUntil: "networkidle", timeout: 60000 });
 
     log("[SETUP] Configuring viewport...", VERBOSITY.DETAILED);
-    await page.setViewportSize({ width: 600, height: 600 });
+    await page.setViewportSize({ width: 800, height: 600 });
 
     log("[SETUP] Hiding buttons...", VERBOSITY.DETAILED);
     await page.evaluate(() => {
@@ -163,17 +186,17 @@ async function captureMap(page, includeGeoJson, coordinates) {
       Array.from({ length: randomCoordinatesCount }, generateRandomCoordinate)
     );
 
-    // Process base coordinates
-    log("[PROCESSING] Starting base captures...", VERBOSITY.BASIC);
+    // Process base captures
+    log("[PROCESSING] Capturing base images...", VERBOSITY.BASIC);
     await captureMap(page, false, allCoordinates);
 
-    // Process mask coordinates
-    log("[PROCESSING] Starting mask captures...", VERBOSITY.BASIC);
+    // Process mask captures
+    log("[PROCESSING] Capturing mask images...", VERBOSITY.BASIC);
     await captureMap(page, true, allCoordinates);
 
     log("[SUCCESS] All captures completed!", VERBOSITY.BASIC);
   } catch (error) {
-    log(`[FATAL ERROR] Main execution failed: ${error.message}`, VERBOSITY.BASIC);
+    log(`[FATAL ERROR] ${error.message}`, VERBOSITY.BASIC);
   } finally {
     if (browser) {
       log("[CLEANUP] Closing browser...", VERBOSITY.BASIC);

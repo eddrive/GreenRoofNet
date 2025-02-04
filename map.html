@@ -1,76 +1,93 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Google Maps con GeoJSON</title>
-    <!-- lorenzo:***REMOVED***
-         edo: ***REMOVED***
-    -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=***REMOVED***"></script>
-    <style>
-      #map {
-        height: 500px;
-        width: 500px; /* Imposta la mappa come quadrata */
-      }
-    </style>
-  </head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Azure Maps with Bing Aerial</title>
+  <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
+  <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" />
+  <style>
+    #map {
+      width: 800px;
+      height: 600px;
+    }
+  </style>
+</head>
+<body>
 
-  <body>
-    <div id="map"></div>
-    <button id="maskButton">Mask</button>
+  <div id="map"></div>
+  <button id="maskButton">Toggle Mask</button>
 
-    <script>
-       
-      window.map = null;
+  <script>
+    // Use var for variables you need to expose or explicitly attach to window.
+    var map;
+    var dataSource;
+    var layer;
+    // Attach maskVisible to window so that it is accessible to Playwright.
+    window.maskVisible = false;
+    const azureMapsKey = "***REMOVED***"; // Your Azure Maps key
 
-      function initMap() {
-        console.log("initMap");
-        // Inizializza la mappa
-        window.map = new google.maps.Map(document.getElementById("map"), {
-          center: { lat: 45.4642, lng: 9.19 }, // Milano
-          zoom: 20,
-          mapTypeId: "satellite",
-          tilt: 0, // Inizialmente senza tilt
-          disableDefaultUI: true, // Disabilita tutti i controlli di default
+    function initMap() {
+      window.map = new atlas.Map("map", {
+        center: [9.19, 45.4642], // Milan, Italy
+        zoom: 19, // Use 18 or 19 for close-up aerial views
+        pitch: 0, // Tilt for better perspective
+        style: "grayscale_light", // Base style (we override with Bing tiles)
+        authOptions: {
+          authType: "subscriptionKey",
+          subscriptionKey: azureMapsKey
+        }
+      });
+
+      window.map.events.add("ready", function () {
+        // Add the custom Bing aerial tile layer
+        let bingTileLayer = new atlas.layer.TileLayer({
+          tileUrl: "http://ak.t0.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?n=z&g=5880",
+          tileSize: 256
         });
+        window.map.layers.add(bingTileLayer, "background"); // Add under other layers
 
-        // Carica il GeoJSON
-        window.map.data.loadGeoJson("./cleaned_potentialGR.geojson", {}, () => {
-          // Imposta uno stile predefinito
-          window.map.data.setStyle({
-            fillColor: "green", // Predefinito verde
-            strokeColor: "green",
-            strokeWeight: 2,
-            fillOpacity: 0.5,
-            visible: false,
+        // Create a data source for the mask layer
+        dataSource = new atlas.source.DataSource();
+        window.map.sources.add(dataSource);
+
+        // Load GeoJSON data
+        fetch("./cleaned_potentialGR.geojson")
+          .then(response => response.json())
+          .then(data => {
+            dataSource.add(data);
           });
-        });
-      }
 
-      function setMask(vis) {
-
-        window.map.data.setStyle({
-          fillColor: "green",
+        // Create a polygon layer (mask) using the global maskVisible state
+        layer = new atlas.layer.PolygonLayer(dataSource, null, {
+          fillColor: "rgba(0, 255, 0, 0.5)", // Green semi-transparent
           strokeColor: "green",
-          strokeWeight: vis ? 2 : 0,
-          fillOpacity: vis ? 0.5 : 0,
-          visible: vis,
+          strokeWidth: 2,
+          visible: window.maskVisible
         });
+        window.map.layers.add(layer);
+      });
+    }
+
+    // Toggle the mask layer visibility and update the global variable.
+    function setMask(vis) {
+      if (layer) {
+        layer.setOptions({
+          visible: vis
+        });
+        window.maskVisible = vis;
       }
+    }
+    // Expose the function on the global object so that captureMap.js can call it.
+    window.setMask = setMask;
 
-       // Add event listener to the button
-       document
-        .getElementById("maskButton")
-        .addEventListener("click", () => setMask(!window.map.data.getStyle().visible));
+    // Button event listener for manual toggling.
+    document.getElementById("maskButton").addEventListener("click", () => {
+      setMask(!window.maskVisible);
+    });
 
+    window.onload = initMap;
+  </script>
 
-      // Inizializza la mappa al caricamento
-      window.onload = initMap;
-
-
-     
-    </script>
-
-    <!-- Aggiungi html2canvas per catturare l'immagine -->
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  </body>
+</body>
 </html>
