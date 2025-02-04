@@ -10,7 +10,7 @@ const VERBOSITY = {
 };
 const verbosityLevel = VERBOSITY.BASIC; // Set desired verbosity level
 const randomCoordinatesCount = 100; // Number of random coordinates to generate
-const headless = true; // Set to true for headless execution
+const headless = false; // Set to true for headless execution
 
 // Fixed coordinates
 const fixedCoordinates = [
@@ -57,8 +57,8 @@ function generateRandomCoordinate() {
 async function waitForTilesToLoad(page) {
   await page.evaluate(() => {
     return new Promise((resolve) => {
-      // We'll consider the tiles loaded once no render events have occurred for this many ms.
-      const idleThreshold = 100; 
+      // We'll consider the tiles loaded once no render events have occurred for this many ms. min 10ms to avoid false positives.
+      const idleThreshold = 10; 
       let lastRenderTime = Date.now();
 
       // Update the last render time on every render event.
@@ -169,7 +169,7 @@ async function captureMap(page, includeGeoJson, coordinates) {
     await page.goto("http://localhost:3000/map.html", { waitUntil: "networkidle", timeout: 60000 });
 
     log("[SETUP] Configuring viewport...", VERBOSITY.DETAILED);
-    await page.setViewportSize({ width: 800, height: 600 });
+    await page.setViewportSize({ width: 600, height: 600 });
 
     log("[SETUP] Hiding buttons...", VERBOSITY.DETAILED);
     await page.evaluate(() => {
