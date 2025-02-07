@@ -60,8 +60,9 @@
 
         // Create a polygon layer (mask) using the global maskVisible state
         layer = new atlas.layer.PolygonLayer(dataSource, null, {
-          fillColor: "rgba(0, 255, 0, 0.5)", // Green semi-transparent
+            fillColor: "rgba(255, 0, 255, 100)", // Bright fuchsia with full transparency
           strokeColor: "green",
+          fillOpacity: 1,
           strokeWidth: 2,
           visible: window.maskVisible
         });
