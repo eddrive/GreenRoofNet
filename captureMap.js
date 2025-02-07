@@ -9,8 +9,9 @@ const VERBOSITY = {
   DETAILED: 2,
 };
 const verbosityLevel = VERBOSITY.BASIC; // Set desired verbosity level
-const randomCoordinatesCount = 200; // Number of random coordinates to generate
+const randomCoordinatesCount = 20; // Number of random coordinates to generate
 const headless = true; // Set to true for headless execution
+const port = 3000; // Port where the local server is running
 
 // Fixed coordinates
 const fixedCoordinates = [
@@ -58,7 +59,7 @@ async function waitForTilesToLoad(page) {
   await page.evaluate(() => {
     return new Promise((resolve) => {
       // We'll consider the tiles loaded once no render events have occurred for this many ms. min 10ms to avoid false positives.
-      const idleThreshold = 10; 
+      const idleThreshold = 10;
       let lastRenderTime = Date.now();
 
       // Update the last render time on every render event.
@@ -165,7 +166,7 @@ async function captureMap(page, includeGeoJson, coordinates) {
     const page = await browser.newPage();
 
     log("[NAVIGATION] Loading page...", VERBOSITY.BASIC);
-    await page.goto("http://localhost:3000/map.html", { waitUntil: "networkidle", timeout: 60000 });
+    await page.goto(`http://localhost:${port}/map.html`, { waitUntil: "networkidle" });
 
     log("[SETUP] Configuring viewport...", VERBOSITY.DETAILED);
     await page.setViewportSize({ width: 600, height: 600 });
