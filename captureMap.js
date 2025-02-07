@@ -9,8 +9,8 @@ const VERBOSITY = {
   DETAILED: 2,
 };
 const verbosityLevel = VERBOSITY.BASIC; // Set desired verbosity level
-const randomCoordinatesCount = 100; // Number of random coordinates to generate
-const headless = false; // Set to true for headless execution
+const randomCoordinatesCount = 200; // Number of random coordinates to generate
+const headless = true; // Set to true for headless execution
 
 // Fixed coordinates
 const fixedCoordinates = [
@@ -127,15 +127,14 @@ async function captureMap(page, includeGeoJson, coordinates) {
     log("[STATUS] Waiting for mask visibility update...", VERBOSITY.DETAILED);
     await waitForMaskVisibility(page, includeGeoJson);
 
+    let counter = 0;
     for (const coords of coordinates) {
-      log(`[STATUS] Moving to: ${JSON.stringify(coords)}...`, VERBOSITY.DETAILED);
+      counter++;
+      log(`[STATUS] Processing ${counter}/${coordinates.length}: Moving to ${JSON.stringify(coords)}...`, VERBOSITY.BASIC);
       await page.evaluate((c) => window.map.setCamera({ center: [c.lng, c.lat] }), coords);
 
-
       log("[STATUS] Waiting for tiles to load...", VERBOSITY.DETAILED);
-      // harcode a 2 sec timer
-      // await page.waitForTimeout(1000);
-       await waitForTilesToLoad(page);
+      await waitForTilesToLoad(page);
 
       // Capture screenshot
       log("[STATUS] Capturing screenshot...", VERBOSITY.DETAILED);
