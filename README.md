@@ -41,7 +41,7 @@ This report details the implementation of both models. For both models, we exper
 ### 2. Model Architectures
 
 #### 2.1. EfficientNetB7
-We used **EfficientNetB7** as a feature extractor, **removing its top classification layer** and keeping the pre-trained weights frozen to prevent overfitting. The extracted features were then passed through a custom **decoder** built with **Conv2DTranspose layers** for upsampling.
+We used EfficientNetB7 as a feature extractor, removing its top classification layer and keeping the pre-trained weights frozen to prevent overfitting. The extracted features were then passed through a custom decoder built with Conv2DTranspose layers for upsampling.
 
 ##### **Model Implementation**
 ```python
@@ -83,7 +83,9 @@ early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, r
 ---
 
 #### 3.2. DeepLabV3+ with ResNet50
-The second approach used **DeepLabV3+**, a well-established segmentation model with **ResNet50** as a backbone for feature extraction. DeepLabV3+ is particularly effective in capturing contextual information through **Atrous Spatial Pyramid Pooling (ASPP)**.
+The second approach used DeepLabV3+, an advanced semantic segmentation model that builds on DeepLabV3 by adding a decoder module for improved boundary refinement. It employs ResNet50 as a backbone for feature extraction, utilizing its deep residual connections to capture hierarchical features at different levels.
+
+A key component of DeepLabV3+ is Atrous Spatial Pyramid Pooling. ASPP applies dilated convolutions with different dilation rates (6, 12, 18) to process image features at multiple receptive fields, effectively balancing fine-grained details with broader spatial context. This makes DeepLabV3+ particularly well-suited for segmenting objects of varying sizes within high-resolution satellite images.
 
 ##### **Model Implementation**
 ```python
@@ -135,6 +137,7 @@ def build_model(input_shape=(600, 600, 3), num_classes=1):
 ```
 
 #### **Training and Compilation**
+We used a dataset of 3,000 normalized images, Less than the previous one due to the limited resources of our development environment. After numerous experiments with different configurations, this was found to be the best setup.
 ```python
 optimizer = 'adam'
 'binary_crossentropy'
