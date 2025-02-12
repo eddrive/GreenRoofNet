@@ -1,4 +1,4 @@
-# GreenRoof
+# GreenRoofNet
 
 ## Installation (Dataset Creation)
 
