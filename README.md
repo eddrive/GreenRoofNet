@@ -183,4 +183,7 @@ Given the poor results achieved by the models in the IoU metric, we thought of c
 |  Recall     |   0.9668      |
 |  IoU        |   0.8251      |
 
-![Neural network output using Ensamble](images/Ensamble.png)
+| Satellite image | Ground truth | Model output |
+|---------------------------------|---------------------------------|---------------------------------|
+| ![Image 1](images/Sat1.jpeg) | ![Image 2](images/Mask1.jpeg) | ![Image 3](images/Ens1.jpeg) |
+| ![Image 4](images/Sat2.jpeg) | ![Image 5](images/Mask2.jpeg) | ![Image 6](images/Ens2.jpeg) |
