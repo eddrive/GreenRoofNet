@@ -77,7 +77,7 @@ The core of the dataset is a GeoJson file (`cleaned_potentialGR.geojson`) provid
 We tried to overlay the geojson on different satellite maps, we tried Google Maps, Microsoft Azure maps (ex. Bing Maps), and OpenStreetMap. We found that Azure was the best candidate for our purpose, as it provided not only high-res aerial imagery but the coordinates of our geojson aligned the best with their maps.
 | Azure Map               | Google Map                 |
 |-------------------------|----------------------------|
-| ![Azure Map](image.png) | ![Google Map](image-1.png) |
+| ![Azure Map](images/azure.jpg) | ![Google Map](images/google.jpg) |
 
 ### 3. Map preparation
 we decided to create a simple webapp, `map.html` to visualize the map with the option to pan and to enable or disable the geojson mask, we went with this option because azure maps is mostly built to be used on the web, so this was the most documented and straightforward way to use it.
