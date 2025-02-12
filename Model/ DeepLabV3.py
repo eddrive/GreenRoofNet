@@ -9,7 +9,7 @@ from tensorflow.keras.applications.resnet50 import preprocess_input
 from sklearn.model_selection import train_test_split
 
 # Load compressed dataset stored in NPZ format
-npzfile = np.load('Data.npz')
+npzfile = np.load('dataset/preprocessed/dataset_compressed.npz')
 X = npzfile['images']  # Feature images
 Y = npzfile['masks']  # Corresponding segmentation masks
 
@@ -86,18 +86,21 @@ X_test = preprocess_input(X_test)
 # Early stopping callback to prevent overfitting
 early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
 
+batch_size = 8
+epochs = 50
+
 # Train the model
 history = deep_model.fit(
     X_train, Y_train,
     validation_data=(X_val, Y_val),
-    batch_size=8,
-    epochs=50,
+    batch_size=batch_size,
+    epochs=epochs,
     verbose=1,
     callbacks=[early_stopping]
 )
 
 # save the model with a descriptive filename
-deep_model.save(f'model_deeplabv3plus_{X_train.shape[0]}_{50}.keras')
+deep_model.save(f'model_deeplabv3plus_{X_train.shape[0]}_{batch_size}_{epochs}.keras')
 
 # Function to visualize model predictions
 def plot_predictions(model, X, Y, num_samples=3):

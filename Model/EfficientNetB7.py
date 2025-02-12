@@ -8,7 +8,7 @@ from tensorflow.keras.applications import EfficientNetB7
 from sklearn.model_selection import train_test_split
 
 # Load compressed dataset stored in NPZ format
-npzfile = np.load('Data.npz')
+npzfile = np.load('dataset/preprocessed/dataset_compressed.npz')
 X = npzfile['images']  # Feature images
 Y = npzfile['masks']  # Corresponding segmentation masks
 
