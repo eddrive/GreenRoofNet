@@ -96,6 +96,9 @@ history = deep_model.fit(
     callbacks=[early_stopping]
 )
 
+# save the model with a descriptive filename
+deep_model.save(f'model_deeplabv3plus_{X_train.shape[0]}_{50}.keras')
+
 # Function to visualize model predictions
 def plot_predictions(model, X, Y, num_samples=3):
     indices = random.sample(range(len(X)), num_samples)  # Randomly select sample indices
