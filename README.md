@@ -167,7 +167,10 @@ early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, r
 |  Recall     |   0.9706       |
 |  IoU        |   0.7378       |
 
-![Neural network output using ResNet50](images/ResNet50.png)
+| Satellite image | Ground truth | Model output |
+|---------------------------------|---------------------------------|---------------------------------|
+| ![Image 1](images/Sat1.jpeg) | ![Image 2](images/Mask1.jpeg) | ![Image 3](images/Res1.jpeg) |
+| ![Image 4](images/Sat2.jpeg) | ![Image 5](images/Mask2.jpeg) | ![Image 6](images/Res2.jpeg) |
 ---
 
 ### 3. Ensamble Model
