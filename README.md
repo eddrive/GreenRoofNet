@@ -28,7 +28,7 @@ Once we had our dataset we started building our neural network. To tackle this p
 
 Two models were chosen for experimentation:
 - **EfficientNetB7**: A highly optimized CNN known for its strong feature extraction capabilities.
-- **DeepLabV3+ with ResNet50**: A state-of-the-art segmentation architecture that combines deep residual learning with **Atrous Spatial Pyramid Pooling (ASPP)**.
+- **DeepLabV3+ with ResNet50**: A state-of-the-art segmentation architecture that combines deep residual learning with Atrous Spatial Pyramid Pooling (ASPP).
 
 This report details the implementation of both models. For both models, we experimented with different hyperparameters and empirically determined the best ones. Additionally, we experimented with two different loss functions: Binary Cross-Entropy (BCE) and Focal Loss.
 
@@ -79,10 +79,19 @@ batch_size = 20
 epochs = 100
 early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
 ```
+| Metrics | Value | 
+|:---------:|:---------:|
+|  Accuracy   |   0.9129       |
+|  Precision  |   0.9614       |
+|  Recall     |   0.9400       |
+|  IoU        |   0.6777       |
+
+![Neural network output using EfficientNetB7](images/EfficientNetB7.png)
+
 
 ---
 
-#### 3.2. DeepLabV3+ with ResNet50
+#### 2.2. DeepLabV3+ with ResNet50
 The second approach used DeepLabV3+, an advanced semantic segmentation model that builds on DeepLabV3 by adding a decoder module for improved boundary refinement. It employs ResNet50 as a backbone for feature extraction, utilizing its deep residual connections to capture hierarchical features at different levels.
 
 A key component of DeepLabV3+ is Atrous Spatial Pyramid Pooling. ASPP applies dilated convolutions with different dilation rates (6, 12, 18) to process image features at multiple receptive fields, effectively balancing fine-grained details with broader spatial context. This makes DeepLabV3+ particularly well-suited for segmenting objects of varying sizes within high-resolution satellite images.
@@ -147,5 +156,24 @@ epochs = 50
 early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
 
 ```
+| Metrics | Value | 
+|:---------:|:---------:|
+|  Accuracy   |   0.9348       |
+|  Precision  |   0.9561       |
+|  Recall     |   0.9706       |
+|  IoU        |   0.7378       |
 
+![Neural network output using ResNet50](images/ResNet50.png)
 ---
+
+### 3. Ensamble Model
+Given the poor results achieved by the models in the IoU metric, we thought of combining the two to create an ensemble. By combining the predictions of both models and computing their average, we observed a significant improvement in segmentation performance. This ensemble approach leverages the strengths of both architectures: the robust feature extraction of EfficientNetB7 and the detailed spatial understanding of DeepLabV3+. The final output benefits from a more balanced segmentation with improved boundary refinement and generalization capabilities.
+
+| Metrics | Value | 
+|:---------:|:---------:|
+|  Accuracy   |   0.9500       |
+|  Precision  |   0.9759       |
+|  Recall     |   0.9668      |
+|  IoU        |   0.8251      |
+
+![Neural network output using Ensamble](images/Ensamble.png)
