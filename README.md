@@ -88,8 +88,8 @@ early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, r
 
 | Satellite image | Ground truth | Model output |
 |---------------------------------|---------------------------------|---------------------------------|
-| ![Image 1](images/Sat1.png) | ![Image 2](images/Mask1.png) | ![Image 3](images/Eff1.png) |
-| ![Image 4](images/Sat2.png) | ![Image 5](images/Mask2.png) | ![Image 6](images/Eff2.png) |
+| ![Image 1](images/Sat1.jpeg) | ![Image 2](images/Mask1.jpeg) | ![Image 3](images/Eff1.jpeg) |
+| ![Image 4](images/Sat2.jpeg) | ![Image 5](images/Mask2.jpeg) | ![Image 6](images/Eff2.jpeg) |
 
 
 
