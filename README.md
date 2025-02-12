@@ -94,7 +94,7 @@ Some example images are shown below:
 
 | Satellite image | Masked image |
 |-----------------|--------------|
-| ![Image 1](dataset/images/45.46002_9.18572.png) | ![Image 2](dataset/masks/45.46002_9.18572.png) |
+| ![Image 1](images/45.46002_9.18572.jpg) | ![Image 2](images/45.46002_9.18572-1.jpg) |
 
 ### 5. Dataset Preprocessing
 the previous script saves "raw" 600x600 .png images, for the dataset we used of 5000+5000 images this resulted in a total of around 5GB.
