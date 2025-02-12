@@ -9,17 +9,12 @@ const VERBOSITY = {
   DETAILED: 2,
 };
 const verbosityLevel = VERBOSITY.BASIC; // Set desired verbosity level
-const randomCoordinatesCount = 20; // Number of random coordinates to generate
+const randomCoordinatesCount = 5000; // Number of random coordinates to generate
 const headless = true; // Set to true for headless execution
 const port = 3000; // Port where the local server is running
 
 // Fixed coordinates
 const fixedCoordinates = [
-  { lat: 45.496398017034764, lng: 9.224118614878336 },
-  { lat: 45.506786509037966, lng: 9.229450783645406 },
-  { lat: 45.496182354998574, lng: 9.22742856500629 },
-  { lat: 45.50016410794893, lng: 9.236237413743334 },
-  { lat: 45.49344335822781, lng: 9.228427352122873 },
 ];
 
 // Bounding box for random coordinates
@@ -59,7 +54,7 @@ async function waitForTilesToLoad(page) {
   await page.evaluate(() => {
     return new Promise((resolve) => {
       // We'll consider the tiles loaded once no render events have occurred for this many ms. min 10ms to avoid false positives.
-      const idleThreshold = 10;
+      const idleThreshold = 50;
       let lastRenderTime = Date.now();
 
       // Update the last render time on every render event.
