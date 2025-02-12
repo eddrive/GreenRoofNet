@@ -1,13 +1,18 @@
-# GreenRoofNet
+# Requirements
 
-## Installation (Dataset Creation)
+- Node.js (tested with v18.0.0)
+- Python 3 (tested with 3.12.4)
+
+# Dataset
+
+### Installation
 
 ```sh
 npm install
 npx playwright install
 ```
 
-## Create Dataset
+### Usage (dataset creation)
 
 Start the local server:
 
@@ -15,10 +20,105 @@ Start the local server:
 serve
 ```
 
-Run the dataset script:
+copy the port number and paste it in the `captureMap.js` file.
+
+Run the dataset creation script:
 
 ```sh
 node captureMap.js
+```
+# Models
+
+### Installation
+
+install python dependencies (might not be an exhaustive list)
+
+```sh
+pip install -r requirements.txt
+```
+
+
+### train the models
+
+run the preprocessing script to prepare the dataset for training
+
+```sh
+python3 preprocessing.py
+```
+
+move to the models directory
+
+to train DeepLabV3+ with ResNet50:
+
+```sh
+python3 DeepLabV3.py
+```
+
+to train EfficientNetB7:
+
+```sh
+python3 EfficientNetB7.py
+```
+
+it's possible to change models parameters (like epoch and batch size) directly in the scripts
+
+### Usage
+
+to use both models and the ensemble model, use the Evaluation notebook (be sure to modify it with the correct models file paths)
+
+it's possible to use the already trained models present in the folder `Model`
+
+# Report
+## Data Collection and Preprocessing
+### 1. Already Available Data
+The core of the dataset is a GeoJson file (`cleaned_potentialGR.geojson`) provided by the municipality of Milan containing the coordinates of roofs that can be potential green areas. We cleaned it and reformatted it to make it usable for our purpose.
+
+### 2. Choice of underlying Satellite Imagery
+We tried to overlay the geojson on different satellite maps, we tried Google Maps, Microsoft Azure maps (ex. Bing Maps), and OpenStreetMap. We found that Azure was the best candidate for our purpose, as it provided not only high-res aerial imagery but the coordinates of our geojson aligned the best with their maps.
+| Azure Map               | Google Map                 |
+|-------------------------|----------------------------|
+| ![Azure Map](image.png) | ![Google Map](image-1.png) |
+
+### 3. Map preparation
+we decided to create a simple webapp, `map.html` to visualize the map with the option to pan and to enable or disable the geojson mask, we went with this option because azure maps is mostly built to be used on the web, so this was the most documented and straightforward way to use it.
+
+it is possible to see this map by running the `serve` command and opening `localhost:3000/map.html` (or equivalent port on your device) in the browser.
+
+### 4. Dataset collection
+We used Playwright to automate the process of capturing the map and the mask, we created a script `captureMap.js` that captures the map and the mask and saves them in the `dataset` folder.
+it first goes through all the screenshot for unmasked images, then it enables the mask and pans back to the same coordinates and takes the screenshot with the mask. we decided to do it in this way to avoid waiting for the mask to load every time.
+
+Assuming a good internet connection to load the satellite map, the script can do around 5 screenshots per second.
+
+Some example images are shown below:
+
+| Satellite image | Masked image |
+|-----------------|--------------|
+| ![Image 1](dataset/images/45.46002_9.18572.png) | ![Image 2](dataset/masks/45.46002_9.18572.png) |
+
+### 5. Dataset Preprocessing
+the previous script saves "raw" 600x600 .png images, for the dataset we used of 5000+5000 images this resulted in a total of around 5GB.
+
+We decided to convert them in numpy arrays and save them in a .npz file to save space and to speed up the training process.
+
+we also convert the masks to binary masks (1 for non-green area, 0 for green area) as this is the format required by the models. In this way when visualizing the mask with matplotlib possible green areas are shown in black and non-green areas are shown in white.
+
+
+
+```python
+def preprocess_image_and_mask(image_path, mask_path, target_size=(600, 600)):
+    image = cv2.imread(image_path)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    mask = cv2.imread(mask_path)
+    mask_rgb = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
+    magenta = np.array([255, 0, 255])
+    binary_mask = np.all(mask_rgb == magenta, axis=-1).astype(np.uint8)
+    binary_mask = (1 - binary_mask)  # Invert values: magenta=0, everything else=1
+    binary_mask = cv2.resize(binary_mask, target_size, interpolation=cv2.INTER_NEAREST)
+    binary_mask = np.expand_dims(binary_mask, axis=-1)  # Add channel dimension
+    
+    return image, binary_mask
 ```
 
 ## Deep learning Model building
