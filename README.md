@@ -24,7 +24,7 @@ node captureMap.js
 ## Deep learning Model building
 
 ### 1. Approach and Methodology
-Once we had our dataset we started building our neural network. To tackle this problem, we employed a **transfer learning** approach. Given the high resolution of the images, we selected architectures that accept **600 × 600 × 3** input dimensions.
+Once we had our dataset we started building our neural network. To tackle this problem, we employed a **transfer learning** approach. Given the high resolution of the images, we selected architectures that accept 600 × 600 × 3 input dimensions.
 
 Two models were chosen for experimentation:
 - **EfficientNetB7**: A highly optimized CNN known for its strong feature extraction capabilities.
@@ -149,7 +149,7 @@ def build_model(input_shape=(600, 600, 3), num_classes=1):
 We used a dataset of 3,000 normalized images, Less than the previous one due to the limited resources of our development environment. After numerous experiments with different configurations, this was found to be the best setup.
 ```python
 optimizer = 'adam'
-'binary_crossentropy'
+loss = 'binary_crossentropy'
 metrics = ['accuracy', iou_metric]
 batch_size = 8
 epochs = 50
