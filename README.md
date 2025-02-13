@@ -263,7 +263,7 @@ serve
 After running this command, a port number will be displayed in the terminal (e.g., http://localhost:3000).
 #### 3. Configure the Capture Script
 Copy the port number from the terminal output and paste it into the `captureMap.js`. You will typically need to update a line in the script where the local server address is defined, ensuring the script can properly load the satellite maps.
-#### 4. 4. Run the Dataset Creation Script
+#### 4. Run the Dataset Creation Script
 Once the server is running and the correct port is set, execute the dataset generation script:
 ```sh
 node captureMap.js
@@ -273,7 +273,7 @@ This script will:
 - Capture screenshots of the map tiles.
 - Save the images as part of the dataset for training the model.
 - After execution, your dataset will be available in the specified output directory.
-## Models
+### Models training
 
 ### Installation
 
