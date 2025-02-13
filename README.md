@@ -273,15 +273,28 @@ Additionally, the dataset generation process uses Playwright, a tool for browser
 npx playwright install
 ```
 This ensures that all required browser engines are available for capturing satellite images.
-#### 2. Start the Local Server
+#### 2. Configure Azure Key
+The script uses Azure Maps for satellite imagery. To enable this, you must replace the placeholder key in the map.html file with your personal Azure Maps key. To obtain an Azure Maps key:
+
+- Go to the [Azure Portal](https://azure.microsoft.com/de-de/get-started/azure-portal/).
+
+- Create a new Azure Maps account if you don’t already have one.
+
+- Navigate to "Keys" and copy your primary key.
+
+- Open map.html and locate the placeholder key in the script.
+
+- Replace it with your actual Azure Maps key.
+
+#### 3. Start the Local Server
 The dataset creation script relies on a local server to load map tiles and capture images. Start the server with:
 ```sh
 serve
 ```
 After running this command, a port number will be displayed in the terminal (e.g., http://localhost:3000).
-#### 3. Configure the Capture Script
+#### 4. Configure the Capture Script
 Copy the port number from the terminal output and paste it into the `captureMap.js`. You will typically need to update a line in the script where the local server address is defined, ensuring the script can properly load the satellite maps.
-#### 4. Run the Dataset Creation Script
+#### 5. Run the Dataset Creation Script
 Once the server is running and the correct port is set, execute the dataset generation script:
 ```sh
 node captureMap.js
