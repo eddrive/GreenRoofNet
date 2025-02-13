@@ -1,3 +1,12 @@
+# Introduction
+In recent years, uncontrolled urbanization and climate change have intensified environmental challenges in large cities. Milan, like many other urban centers, faces two major issues: high levels of air pollution and an increased risk of flooding due to impermeable surfaces. One potential solution that addresses both problems is the implementation of green roofs—vegetated roof surfaces that provide ecological, economic, and social benefits.
+
+Green roofs contribute to air purification by absorbing fine particulate matter and reducing CO₂ levels. Additionally, they enhance stormwater management by absorbing rainwater and slowing down runoff, thus mitigating the risk of urban flooding. Furthermore, these roofs improve thermal insulation, reduce the urban heat island effect, and contribute to biodiversity by creating green spaces in densely built areas.
+
+Given the potential of green roofs to improve urban environments, this project aims to develop a deep learning model for the automatic segmentation of potential green roof areas from high-resolution satellite images. Using a neural network, the model classifies each pixel in an image to determine whether it belongs to a rooftop that could potentially host vegetation. This segmentation process enables city planners and policymakers to identify suitable locations for green roof installations efficiently, facilitating informed decision-making for sustainable urban development.
+
+---
+
 # Requirements
 
 - Node.js (tested with v18.0.0)
