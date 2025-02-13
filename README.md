@@ -11,7 +11,7 @@ Given the potential of green roofs to improve urban environments, this project a
 
 ## Table of Contents
 - [Dataset](#dataset)
-- [Deep Learning Model](#deepLearningModel)
+- [Deep Learning Model](#deep-learning-model)
 - [Requirements](#requirements)
 - [Usage](#usage)
 
