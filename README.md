@@ -10,9 +10,11 @@ Given the potential of green roofs to improve urban environments, this project a
 ---
 
 ## Table of Contents
-- [Requirements](#requirements)
 - [Dataset](#dataset)
 - [Deep Learning Model](#deepLearningModel)
+- [Requirements](#requirements)
+- [Usage](#usage)
+  
 Installation
 Dataset
 Model Architecture
@@ -21,12 +23,6 @@ Evaluation and Results
 Usage
 Future Improvements
 References
-
-
-## Requirements
-
-- Node.js (tested with v18.0.0)
-- Python 3 (tested with 3.12.4)
 
 ## Dataset
 
@@ -310,3 +306,10 @@ Given the poor results achieved by the models in the IoU metric, we thought of c
 |---------------------------------|---------------------------------|---------------------------------|
 | ![Image 1](images/Sat1.jpeg) | ![Image 2](images/Mask1.jpeg) | ![Image 3](images/Ens1.jpeg) |
 | ![Image 4](images/Sat2.jpeg) | ![Image 5](images/Mask2.jpeg) | ![Image 6](images/Ens2.jpeg) |
+
+## Requirements
+
+- Node.js (tested with v18.0.0)
+- Python 3 (tested with 3.12.4)
+
+## Usage
