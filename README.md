@@ -11,7 +11,8 @@ Given the potential of green roofs to improve urban environments, this project a
 
 ## Table of Contents
 - [Requirements](#requirements)
-- [Dataset Creation](#datasetCreation)
+- [Dataset](#dataset)
+- [Deep Learning Model](#deepLearningModel)
 Installation
 Dataset
 Model Architecture
@@ -92,7 +93,7 @@ to use both models and the ensemble model, use the Evaluation notebook (be sure 
 
 it's possible to use the already trained models present in the folder `Model`
 
-## Dataset Creation
+## Dataset
 ### 1. Ground Truth Data
 The starting point of this project was to establish a ground truth that could provide reliable information about which rooftops could potentially be converted into green roofs. This was made possible thanks to a [GeoJSON file](https://dati.comune.milano.it/dataset/ds1446_tetti-verdi-potenziali)  provided by the Municipality of Milan, which contains the coordinates of rooftops identified as potential green areas. We processed and cleaned this dataset to make it suitable for our analysis.
 
@@ -122,13 +123,13 @@ Some example images are shown below:
 | ![Image 1](images/45.46002_9.18572.jpg) | ![Image 2](images/45.46002_9.18572-1.jpg) |
 
 ### 5. Dataset Preprocessing
-the previous script saves "raw" 600x600 .png images, for the dataset we used of 5000+5000 images this resulted in a total of around 5GB.
+At this point, the final step to prepare our dataset for training was to process the masks to ensure they contained only binary pixel values (0 and 1). This meant converting them into black and white labels, where 0 (black) represented potential green roofs and 1 (white) represented all other areas. These binary masks would serve as ground truth labels for our model.
 
-We decided to convert them in numpy arrays and save them in a .npz file to save space and to speed up the training process.
+Additionally, we needed to compress the dataset into a more efficient format. The previous script saved raw 600x600 .png images, and with a dataset containing 5000+5000 images, this resulted in a total size of around 5GB.
 
-we also convert the masks to binary masks (1 for non-green area, 0 for green area) as this is the format required by the models. In this way when visualizing the mask with matplotlib possible green areas are shown in black and non-green areas are shown in white.
+To optimize storage and speed up the training process, we decided to convert the images and masks into NumPy arrays and store them in a compressed .npz file. This significantly reduced the dataset size while maintaining efficiency for model training.
 
-
+Below, we provide the function used to convert the screen with the mask into a black and white binary format, along with an example of an input pair (satellite image and corresponding mask) that will be used to train the model.
 
 ```python
 def preprocess_image_and_mask(image_path, mask_path, target_size=(600, 600)):
@@ -150,7 +151,7 @@ def preprocess_image_and_mask(image_path, mask_path, target_size=(600, 600)):
 |-----------------|--------------|
 | ![Image 1](images/Sat5.jpeg) | ![Image 2](images/Mask5.jpeg) |
 
-## Deep learning Model building
+## Deep Learning Model
 
 ### 1. Approach and Methodology
 Once we had our dataset we started building our neural network. To tackle this problem, we employed a **transfer learning** approach. Given the high resolution of the images, we selected architectures that accept 600 × 600 × 3 input dimensions.
