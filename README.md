@@ -148,7 +148,7 @@ def preprocess_image_and_mask(image_path, mask_path, target_size=(600, 600)):
 
 | Satellite image | Masked image |
 |-----------------|--------------|
-| ![Image 1](images/Sat5.jpg) | ![Image 2](images/Mask5.jpg) |
+| ![Image 1](images/Sat5.jpeg) | ![Image 2](images/Mask5.jpeg) |
 
 ## Deep learning Model building
 
