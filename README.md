@@ -11,6 +11,7 @@ Given the potential of green roofs to improve urban environments, this project a
 
 ## Table of Contents
 - [Requirements](#requirements)
+- [Dataset Creation](#datasetCreation)
 Installation
 Dataset
 Model Architecture
@@ -91,9 +92,10 @@ to use both models and the ensemble model, use the Evaluation notebook (be sure 
 
 it's possible to use the already trained models present in the folder `Model`
 
-## Data Collection and Preprocessing
-### 1. Already Available Data
-The core of the dataset is a GeoJson file (`cleaned_potentialGR.geojson`) provided by the municipality of Milan containing the coordinates of roofs that can be potential green areas. We cleaned it and reformatted it to make it usable for our purpose.
+## Dataset Creation
+### 1. Ground Truth Data
+The starting point of this project was to establish a ground truth that could provide reliable information about which rooftops could potentially be converted into green roofs. This was made possible thanks to a [GeoJSON file](https://dati.comune.milano.it/dataset/ds1446_tetti-verdi-potenziali)
+ provided by the Municipality of Milan, which contains the coordinates of rooftops identified as potential green areas. We processed and reformatted this dataset to make it suitable for our analysis. The original file can be downloaded from the following link: [insert link here].
 
 ### 2. Choice of underlying Satellite Imagery
 We tried to overlay the geojson on different satellite maps, we tried Google Maps, Microsoft Azure maps (ex. Bing Maps), and OpenStreetMap. We found that Azure was the best candidate for our purpose, as it provided not only high-res aerial imagery but the coordinates of our geojson aligned the best with their maps.
