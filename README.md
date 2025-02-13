@@ -5,7 +5,7 @@ Green roofs contribute to air purification by absorbing fine particulate matter 
 
 Given the potential of green roofs to improve urban environments, this project aims to develop a deep learning model for the automatic segmentation of potential green roof areas from high-resolution satellite images. Using a neural network, the model classifies each pixel in an image to determine whether it belongs to a rooftop that could potentially host vegetation. This segmentation process enables city planners and policymakers to identify suitable locations for green roof installations efficiently, facilitating informed decision-making for sustainable urban development.
 
-![GR](images/tetti-verdi1.jpg)
+![GR](images/tetti-verdi-1.jpg)
 
 ---
 
