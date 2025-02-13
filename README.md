@@ -12,6 +12,7 @@ Given the potential of green roofs to improve urban environments, this project a
 ## Table of Contents
 - [Dataset](#dataset)
 - [Deep Learning Model](#deep-learning-model)
+- [Future Developments](future-developments)
 - [Requirements](#requirements)
 - [Usage](#usage)
 
@@ -232,6 +233,23 @@ Given the poor results achieved by the models in the IoU metric, we thought of c
 |---------------------------------|---------------------------------|---------------------------------|
 | ![Image 1](images/Sat1.jpeg) | ![Image 2](images/Mask1.jpeg) | ![Image 3](images/Ens1.jpeg) |
 | ![Image 4](images/Sat2.jpeg) | ![Image 5](images/Mask2.jpeg) | ![Image 6](images/Ens2.jpeg) |
+
+## Future Developments
+The results obtained in this project demonstrate the feasibility of using deep learning for automatic green roof segmentation from high-resolution satellite imagery. However, there are several directions in which the model could be further improved and extended to enhance its generalization and usability.
+### Testing on Other Cities
+Currently, the model has been trained and tested using data from Milan, where both the satellite images and the ground truth masks were well-aligned. A crucial next step would be to evaluate the model's performance on images from different cities to assess how well it generalizes to new environments.
+
+- If the model performs well, it confirms its robustness in different urban landscapes.
+- If the model struggles, it may indicate a need for fine-tuning or retraining using data from diverse locations.
+By incorporating data from multiple cities, the model could become more adaptable, reducing bias towards a single geographic region.
+### Improving Mask Post-Processing
+The current output of the model consists of pixel-wise binary segmentation masks, which are useful for classification but lack geometric precision. In practice, green roofs are best represented as polygonal shapes rather than rasterized masks.
+
+A possible future improvement is to apply post-processing techniques to refine the segmentation results:
+
+- Polygon Approximation: Convert pixel-based masks into vector-based polygonal representations, making the results more interpretable for urban planners.
+- Morphological Operations: Use techniques such as contour detection and edge smoothing to clean up jagged segmentation outputs.
+This would align the model's output with real-world applications, as city administrations typically work with vector-based GIS data rather than pixel-based masks.
 
 ## Requirements
 
