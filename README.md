@@ -273,43 +273,37 @@ This script will:
 - Capture screenshots of the map tiles.
 - Save the images as part of the dataset for training the model.
 - After execution, your dataset will be available in the specified output directory.
-### Models training
+### Models Training
 
-### Installation
+#### 1. Dependencies Installation
 
-install python dependencies (might not be an exhaustive list)
+Before training the models, you need to install the necessary Python dependencies. Run the following command:
 
 ```sh
 pip install -r requirements.txt
 ```
-
-
-### train the models
-
-run the preprocessing script to prepare the dataset for training
+#### 2. Preprocessing the Dataset
+Before training, the dataset must be preprocessed to ensure it's in the correct format. Run the preprocessing script:
 
 ```sh
 python3 preprocessing.py
 ```
+This script will convert masks into the correct binary format and save the preprocessed data in the structured format (npz) for training.
 
-move to the models directory
-
-to train DeepLabV3+ with ResNet50:
+#### 3. Train the Models
+You can train the two different deep learning models using the following command:
 
 ```sh
 python3 DeepLabV3.py
 ```
-
-to train EfficientNetB7:
+This model is based on the DeepLabV3+ architecture and uses ResNet50 as its feature extractor.
 
 ```sh
 python3 EfficientNetB7.py
 ```
+This model utilizes EfficientNetB7, a highly efficient CNN architecture for feature extraction.
 
-it's possible to change models parameters (like epoch and batch size) directly in the scripts
+#### 4. Model Inference & Evaluation
+Once the models are trained, you can evaluate them and use them for inference.
 
-### Usage
-
-to use both models and the ensemble model, use the Evaluation notebook (be sure to modify it with the correct models file paths)
-
-it's possible to use the already trained models present in the folder `Model`
+To test both trained models and their ensemble version, open and run the Evaluation Notebook.
