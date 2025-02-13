@@ -239,28 +239,40 @@ Given the poor results achieved by the models in the IoU metric, we thought of c
 - Python 3 (tested with 3.12.4)
 
 ## Usage
-### Installation
+### Dataset Creation Instructions
+To generate the dataset, follow these steps carefully:
+
+#### 1. Install Dependencies
+Before running any script, you need to install the required dependencies. Run the following command in your terminal:
 
 ```sh
 npm install
+```
+This will install all necessary Node.js packages listed in the package.json file.
+
+Additionally, the dataset generation process uses Playwright, a tool for browser automation. To install Playwright, run:
+```sh
 npx playwright install
 ```
-
-### Usage (dataset creation)
-
-Start the local server:
-
+This ensures that all required browser engines are available for capturing satellite images.
+#### 2. Start the Local Server
+The dataset creation script relies on a local server to load map tiles and capture images. Start the server with:
 ```sh
 serve
 ```
-
-copy the port number and paste it in the `captureMap.js` file.
-
-Run the dataset creation script:
-
+After running this command, a port number will be displayed in the terminal (e.g., http://localhost:3000).
+#### 3. Configure the Capture Script
+Copy the port number from the terminal output and paste it into the `captureMap.js`. You will typically need to update a line in the script where the local server address is defined, ensuring the script can properly load the satellite maps.
+#### 4. 4. Run the Dataset Creation Script
+Once the server is running and the correct port is set, execute the dataset generation script:
 ```sh
 node captureMap.js
 ```
+This script will:
+- Load satellite images from the local server.
+- Capture screenshots of the map tiles.
+- Save the images as part of the dataset for training the model.
+- After execution, your dataset will be available in the specified output directory.
 ## Models
 
 ### Installation
