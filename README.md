@@ -1,18 +1,32 @@
-# Introduction
+# GreenRoofNet
 In recent years, uncontrolled urbanization and climate change have intensified environmental challenges in large cities. Milan, like many other urban centers, faces two major issues: high levels of air pollution and an increased risk of flooding due to impermeable surfaces. One potential solution that addresses both problems is the implementation of green roofs—vegetated roof surfaces that provide ecological, economic, and social benefits.
 
 Green roofs contribute to air purification by absorbing fine particulate matter and reducing CO₂ levels. Additionally, they enhance stormwater management by absorbing rainwater and slowing down runoff, thus mitigating the risk of urban flooding. Furthermore, these roofs improve thermal insulation, reduce the urban heat island effect, and contribute to biodiversity by creating green spaces in densely built areas.
 
 Given the potential of green roofs to improve urban environments, this project aims to develop a deep learning model for the automatic segmentation of potential green roof areas from high-resolution satellite images. Using a neural network, the model classifies each pixel in an image to determine whether it belongs to a rooftop that could potentially host vegetation. This segmentation process enables city planners and policymakers to identify suitable locations for green roof installations efficiently, facilitating informed decision-making for sustainable urban development.
 
+![GR](images/tetti-verdi1.jpg)
+
 ---
 
-# Requirements
+## Table of Contents
+- [Requirements](#requirements)
+Installation
+Dataset
+Model Architecture
+Training Process
+Evaluation and Results
+Usage
+Future Improvements
+References
+
+
+## Requirements
 
 - Node.js (tested with v18.0.0)
 - Python 3 (tested with 3.12.4)
 
-# Dataset
+## Dataset
 
 ### Installation
 
@@ -36,7 +50,7 @@ Run the dataset creation script:
 ```sh
 node captureMap.js
 ```
-# Models
+## Models
 
 ### Installation
 
@@ -77,7 +91,6 @@ to use both models and the ensemble model, use the Evaluation notebook (be sure 
 
 it's possible to use the already trained models present in the folder `Model`
 
-# Report
 ## Data Collection and Preprocessing
 ### 1. Already Available Data
 The core of the dataset is a GeoJson file (`cleaned_potentialGR.geojson`) provided by the municipality of Milan containing the coordinates of roofs that can be potential green areas. We cleaned it and reformatted it to make it usable for our purpose.
@@ -145,8 +158,6 @@ This report details the implementation of both models. For both models, we exper
 
 - Focal Loss: A variation of BCE that introduces a focusing parameter (gamma) to reduce the relative importance of well-classified examples, thereby helping to handle class imbalance in segmentation tasks.
 
----
-
 ### 2. Model Architectures
 
 #### 2.1. EfficientNetB7
@@ -199,10 +210,6 @@ early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, r
 |---------------------------------|---------------------------------|---------------------------------|
 | ![Image 1](images/Sat1.jpeg) | ![Image 2](images/Mask1.jpeg) | ![Image 3](images/Eff1.jpeg) |
 | ![Image 4](images/Sat2.jpeg) | ![Image 5](images/Mask2.jpeg) | ![Image 6](images/Eff2.jpeg) |
-
-
-
----
 
 #### 2.2. DeepLabV3+ with ResNet50
 The second approach used DeepLabV3+, an advanced semantic segmentation model that builds on DeepLabV3 by adding a decoder module for improved boundary refinement. It employs ResNet50 as a backbone for feature extraction, utilizing its deep residual connections to capture hierarchical features at different levels.
@@ -280,7 +287,6 @@ early_stopping = keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, r
 |---------------------------------|---------------------------------|---------------------------------|
 | ![Image 1](images/Sat1.jpeg) | ![Image 2](images/Mask1.jpeg) | ![Image 3](images/Res1.jpeg) |
 | ![Image 4](images/Sat2.jpeg) | ![Image 5](images/Mask2.jpeg) | ![Image 6](images/Res2.jpeg) |
----
 
 ### 3. Ensamble Model
 Given the poor results achieved by the models in the IoU metric, we thought of combining the two to create an ensemble. By combining the predictions of both models and computing their average, we observed a significant improvement in segmentation performance. This ensemble approach leverages the strengths of both architectures: the robust feature extraction of EfficientNetB7 and the detailed spatial understanding of DeepLabV3+. The final output benefits from a more balanced segmentation with improved boundary refinement and generalization capabilities.
