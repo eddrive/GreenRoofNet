@@ -94,19 +94,20 @@ it's possible to use the already trained models present in the folder `Model`
 
 ## Dataset Creation
 ### 1. Ground Truth Data
-The starting point of this project was to establish a ground truth that could provide reliable information about which rooftops could potentially be converted into green roofs. This was made possible thanks to a [GeoJSON file](https://dati.comune.milano.it/dataset/ds1446_tetti-verdi-potenziali)
- provided by the Municipality of Milan, which contains the coordinates of rooftops identified as potential green areas. We processed and reformatted this dataset to make it suitable for our analysis. The original file can be downloaded from the following link: [insert link here].
+The starting point of this project was to establish a ground truth that could provide reliable information about which rooftops could potentially be converted into green roofs. This was made possible thanks to a [GeoJSON file](https://dati.comune.milano.it/dataset/ds1446_tetti-verdi-potenziali)  provided by the Municipality of Milan, which contains the coordinates of rooftops identified as potential green areas. We processed and cleaned this dataset to make it suitable for our analysis.
 
 ### 2. Choice of underlying Satellite Imagery
-We tried to overlay the geojson on different satellite maps, we tried Google Maps, Microsoft Azure maps (ex. Bing Maps), and OpenStreetMap. We found that Azure was the best candidate for our purpose, as it provided not only high-res aerial imagery but the coordinates of our geojson aligned the best with their maps.
+Once we obtained the GeoJSON file, we needed to use it as a mask on satellite images of Milan to generate the dataset required for training our model. This meant that we had to find high-resolution satellite images that aligned well with our GeoJSON data. However, this proved to be challenging since not many high-resolution satellite maps are publicly available. Additionally, some sources, like Google Maps, had a significant misalignment with our GeoJSON data, making them unsuitable for our needs.
+
+We experimented with overlaying the GeoJSON on different satellite maps, testing Google Maps, Microsoft Azure Maps (formerly Bing Maps), and OpenStreetMap. After thorough evaluation, we found that Azure Maps was the best candidate, as it provided both high-resolution aerial imagery and the best alignment between our GeoJSON coordinates and the satellite images. 
 | Azure Map               | Google Map                 |
 |-------------------------|----------------------------|
 | ![Azure Map](images/azure.jpg) | ![Google Map](images/google.jpg) |
 
 ### 3. Map preparation
-we decided to create a simple webapp, `map.html` to visualize the map with the option to pan and to enable or disable the geojson mask, we went with this option because azure maps is mostly built to be used on the web, so this was the most documented and straightforward way to use it.
+We decided to create a simple webapp, `map.html` to visualize the map with the option to pan and to enable or disable the geojson mask, we went with this option because azure maps is mostly built to be used on the web, so this was the most documented and straightforward way to use it.
 
-it is possible to see this map by running the `serve` command and opening `localhost:3000/map.html` (or equivalent port on your device) in the browser.
+It is possible to see this map by running the `serve` command and opening `localhost:3000/map.html` (or equivalent port on your device) in the browser.
 
 ### 4. Dataset collection
 We used Playwright to automate the process of capturing the map and the mask, we created a script `captureMap.js` that captures the map and the mask and saves them in the `dataset` folder.
