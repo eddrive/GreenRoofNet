@@ -14,80 +14,6 @@ Given the potential of green roofs to improve urban environments, this project a
 - [Deep Learning Model](#deepLearningModel)
 - [Requirements](#requirements)
 - [Usage](#usage)
-  
-Installation
-Dataset
-Model Architecture
-Training Process
-Evaluation and Results
-Usage
-Future Improvements
-References
-
-## Dataset
-
-### Installation
-
-```sh
-npm install
-npx playwright install
-```
-
-### Usage (dataset creation)
-
-Start the local server:
-
-```sh
-serve
-```
-
-copy the port number and paste it in the `captureMap.js` file.
-
-Run the dataset creation script:
-
-```sh
-node captureMap.js
-```
-## Models
-
-### Installation
-
-install python dependencies (might not be an exhaustive list)
-
-```sh
-pip install -r requirements.txt
-```
-
-
-### train the models
-
-run the preprocessing script to prepare the dataset for training
-
-```sh
-python3 preprocessing.py
-```
-
-move to the models directory
-
-to train DeepLabV3+ with ResNet50:
-
-```sh
-python3 DeepLabV3.py
-```
-
-to train EfficientNetB7:
-
-```sh
-python3 EfficientNetB7.py
-```
-
-it's possible to change models parameters (like epoch and batch size) directly in the scripts
-
-### Usage
-
-to use both models and the ensemble model, use the Evaluation notebook (be sure to modify it with the correct models file paths)
-
-it's possible to use the already trained models present in the folder `Model`
 
 ## Dataset
 ### 1. Ground Truth Data
@@ -313,3 +239,65 @@ Given the poor results achieved by the models in the IoU metric, we thought of c
 - Python 3 (tested with 3.12.4)
 
 ## Usage
+### Installation
+
+```sh
+npm install
+npx playwright install
+```
+
+### Usage (dataset creation)
+
+Start the local server:
+
+```sh
+serve
+```
+
+copy the port number and paste it in the `captureMap.js` file.
+
+Run the dataset creation script:
+
+```sh
+node captureMap.js
+```
+## Models
+
+### Installation
+
+install python dependencies (might not be an exhaustive list)
+
+```sh
+pip install -r requirements.txt
+```
+
+
+### train the models
+
+run the preprocessing script to prepare the dataset for training
+
+```sh
+python3 preprocessing.py
+```
+
+move to the models directory
+
+to train DeepLabV3+ with ResNet50:
+
+```sh
+python3 DeepLabV3.py
+```
+
+to train EfficientNetB7:
+
+```sh
+python3 EfficientNetB7.py
+```
+
+it's possible to change models parameters (like epoch and batch size) directly in the scripts
+
+### Usage
+
+to use both models and the ensemble model, use the Evaluation notebook (be sure to modify it with the correct models file paths)
+
+it's possible to use the already trained models present in the folder `Model`
